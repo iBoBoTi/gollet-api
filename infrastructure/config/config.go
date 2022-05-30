@@ -6,6 +6,7 @@ import (
 )
 
 type Config struct {
+	ServerPort string
 	DBHost     string
 	DBName     string
 	DBPort     string
@@ -18,6 +19,7 @@ type Config struct {
 
 func NewConfig() *Config {
 	return &Config{
+		ServerPort: os.Getenv("SERVER_PORT"),
 		DBHost:     os.Getenv("DB_HOST"),
 		DBName:     os.Getenv("DB_DATABASE"),
 		DBPort:     os.Getenv("DB_PORT"),

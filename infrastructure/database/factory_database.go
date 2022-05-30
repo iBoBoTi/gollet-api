@@ -2,7 +2,7 @@ package database
 
 import (
 	"errors"
-	"github.com/iBoBoTi/gollet-api/pkg/config"
+	"github.com/iBoBoTi/gollet-api/infrastructure/config"
 	"github.com/jackc/pgx/pgxpool"
 )
 

@@ -3,7 +3,7 @@ package database
 import (
 	"context"
 	"fmt"
-	"github.com/iBoBoTi/gollet-api/pkg/config"
+	"github.com/iBoBoTi/gollet-api/infrastructure/config"
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/sirupsen/logrus"
 )
