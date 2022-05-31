@@ -13,6 +13,7 @@ type Config struct {
 	DBDriver   string
 	DBUser     string
 	DBPassword string
+	GinMode    string
 
 	CtxTimeout time.Duration
 }
@@ -26,5 +27,6 @@ func NewConfig() *Config {
 		DBDriver:   os.Getenv("DB_DRIVER"),
 		DBUser:     os.Getenv("DB_USER"),
 		DBPassword: os.Getenv("DB_PASSWORD"),
+		GinMode:    os.Getenv("GIN_MODE"),
 	}
 }
