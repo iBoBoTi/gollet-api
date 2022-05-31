@@ -3,7 +3,7 @@ package database
 import (
 	"errors"
 	"github.com/iBoBoTi/gollet-api/infrastructure/config"
-	"github.com/jackc/pgx/pgxpool"
+	"github.com/jackc/pgx/v4/pgxpool"
 )
 
 type DB struct {

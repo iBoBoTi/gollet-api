@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"github.com/iBoBoTi/gollet-api/infrastructure/config"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/sirupsen/logrus"
+	"log"
 )
 
 // ConnectPostgres connects to the postgres database pool and assigns it the Db struct pool field returning Db
 func ConnectPostgres(c *config.Config) (*DB, error) {
-	logrus.Info("Connecting to PostgreSQL DB pool")
+	log.Println("Connecting to Postgresql DB pool")
 	dns := fmt.Sprintf(
 		"host=%s port=%s user=%s dbname=%s sslmode=disable password=%s",
 		c.DBHost,
