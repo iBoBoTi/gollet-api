@@ -11,14 +11,14 @@ type DB struct {
 }
 
 var (
-	errInvalidDatabaseInstance = errors.New("invalid db instance")
+	errInvalidDatabaseInstance = errors.New("invalid database instance")
 )
 
 const (
 	InstancePostgres int = iota
 )
 
-// NewDatabaseFactory returns Db type based of the db instance provided
+// NewDatabaseFactory returns Db type based of the database instance provided
 func NewDatabaseFactory(instance int) (*DB, error) {
 	switch instance {
 	case InstancePostgres:
