@@ -82,8 +82,8 @@ func (g *ginEngine) setAppHandlers() {
 	userService := usecase.NewUserService(userRepo)
 	userHandler := handler.NewUserHandler(userService)
 
-	userRouter := v1.Group("/user")
-	userRouter.POST("/", userHandler.CreateUser)
+	userRouter := v1.Group("/users")
+	userRouter.POST("/", userHandler.SignUpUser)
 	g.router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
