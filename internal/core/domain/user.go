@@ -3,14 +3,23 @@ package domain
 import (
 	"errors"
 	"golang.org/x/crypto/bcrypt"
+	"time"
 )
 
 type User struct {
 	BaseModel
 	Name           string `json:"name" binding:"required"`
-	Email          string `json:"email" binding:"required, email"`
-	Password       string `json:"password" binding:"required"`
+	Email          string `json:"email" binding:"required,email"`
+	Password       string `json:"password" binding:"required,min=6"`
 	HashedPassword []byte `json:"-,omitempty"`
+}
+
+type UserResponse struct {
+	ID        int64
+	Name      string    `json:"name"`
+	Email     string    `json:"email"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func (u *User) SetPassword(password string) error {
