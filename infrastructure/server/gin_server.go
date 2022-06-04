@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/iBoBoTi/gollet-api/infrastructure/database"
 	"github.com/iBoBoTi/gollet-api/internal/adapters/api/handler"
+	"github.com/iBoBoTi/gollet-api/internal/adapters/api/helper"
 	"github.com/iBoBoTi/gollet-api/internal/adapters/repository/psql"
 	"github.com/iBoBoTi/gollet-api/internal/core/usecase"
 	"log"
@@ -72,6 +73,11 @@ func (g *ginEngine) setUpRouter() {
 func (g *ginEngine) setAppHandlers() {
 	v1 := g.router.Group("/api/v1")
 
+	tokenMaker, err := helper.NewJWTMaker(os.Getenv("TOKEN_SECRET"))
+	if err != nil {
+		log.Fatal("failed to create token maker")
+	}
+
 	db, err := database.NewDatabaseFactory(database.InstancePostgres)
 	if err != nil {
 		log.Fatal(err)
@@ -79,11 +85,12 @@ func (g *ginEngine) setAppHandlers() {
 
 	// User
 	userRepo := psql.NewUserRepository(db.Postgres)
-	userService := usecase.NewUserService(userRepo)
+	userService := usecase.NewUserService(userRepo, tokenMaker)
 	userHandler := handler.NewUserHandler(userService)
 
 	userRouter := v1.Group("/users")
 	userRouter.POST("/", userHandler.SignUpUser)
+	userRouter.POST("/login", userHandler.LoginUser)
 	g.router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
