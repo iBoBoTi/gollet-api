@@ -12,12 +12,11 @@ type UserHandler interface {
 
 type UserService interface {
 	SignUpUser(user *domain.User) (*domain.User, error)
-	LoginUser()
+	LoginUser(user *domain.LoginUserRequest) (*domain.LoginUserResponse, error)
 }
 
 type UserRepository interface {
 	SignUpUser(user *domain.User) (*domain.User, error)
 	GetUserByEmail(email string) (*domain.User, error)
 	CreateUserWallet(wallet *domain.Wallet) (*domain.Wallet, error)
-	LoginUser()
 }

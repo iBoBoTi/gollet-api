@@ -40,7 +40,11 @@ func (u *userRepository) CreateUserWallet(wallet *domain.Wallet) (*domain.Wallet
 }
 
 func (u *userRepository) GetUserByEmail(email string) (*domain.User, error) {
-	return nil, nil
+	user := domain.User{}
+	queryString := `SELECT * FROM users WHERE email = $1`
+	err := u.db.QueryRow(context.Background(), queryString, email).Scan(&user.ID, &user.Name, &user.Email, &user.HashedPassword, &user.CreatedAt, &user.UpdatedAt)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
-
-func (u *userRepository) LoginUser() {}

@@ -1,11 +1,13 @@
 package handler
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/iBoBoTi/gollet-api/internal/adapters/api/response"
 	"github.com/iBoBoTi/gollet-api/internal/core/domain"
 	"github.com/iBoBoTi/gollet-api/internal/core/ports"
 	"github.com/jackc/pgconn"
+	"github.com/jackc/pgx/v4"
 	"net/http"
 )
 
@@ -48,4 +50,28 @@ func (u *userHandler) SignUpUser(c *gin.Context) {
 	response.JSON(c, "Success", http.StatusOK, userResponse, nil)
 }
 
-func (u *userHandler) LoginUser(c *gin.Context) {}
+func (u *userHandler) LoginUser(c *gin.Context) {
+	var req domain.LoginUserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		response.JSON(c, "invalid request body", http.StatusBadRequest, nil, []string{err.Error()})
+		return
+	}
+
+	userResponse, err := u.userService.LoginUser(&req)
+	if err != nil {
+		switch err {
+		case pgx.ErrNoRows:
+			response.JSON(c, "user not found", http.StatusNotFound, nil, []string{err.Error()})
+			return
+		case domain.ErrInvalidPassword:
+			response.JSON(c, "invalid password", http.StatusUnauthorized, nil, []string{err.Error()})
+			return
+		default:
+			fmt.Println("here I am 500")
+			response.JSON(c, "Error", http.StatusInternalServerError, nil, []string{err.Error()})
+			return
+		}
+	}
+
+	response.JSON(c, "Success", http.StatusOK, userResponse, nil)
+}

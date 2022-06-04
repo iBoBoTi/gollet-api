@@ -22,6 +22,16 @@ type UserResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type LoginUserRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+type LoginUserResponse struct {
+	AccessToken string `json:"access_token"`
+	UserResponse
+}
+
 func (u *User) SetPassword(password string) error {
 	hash, err := HashPassword(password)
 	if err != nil {

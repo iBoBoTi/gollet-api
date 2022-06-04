@@ -4,15 +4,18 @@ import (
 	"errors"
 	"github.com/iBoBoTi/gollet-api/internal/core/domain"
 	"github.com/iBoBoTi/gollet-api/internal/core/ports"
+	"time"
 )
 
 type userService struct {
 	userRepository ports.UserRepository
+	tokenMaker     ports.TokenMaker
 }
 
-func NewUserService(userRepo ports.UserRepository) ports.UserService {
+func NewUserService(userRepo ports.UserRepository, tokenMaker ports.TokenMaker) ports.UserService {
 	return &userService{
 		userRepository: userRepo,
+		tokenMaker:     tokenMaker,
 	}
 }
 
@@ -45,4 +48,31 @@ func (u *userService) SignUpUser(user *domain.User) (*domain.User, error) {
 	return result, nil
 }
 
-func (u *userService) LoginUser() {}
+func (u *userService) LoginUser(loginRequest *domain.LoginUserRequest) (*domain.LoginUserResponse, error) {
+	foundUser, err := u.userRepository.GetUserByEmail(loginRequest.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	err = foundUser.VerifyPassword(loginRequest.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	userResponse := domain.UserResponse{
+		ID:        foundUser.ID,
+		Name:      foundUser.Name,
+		Email:     foundUser.Email,
+		CreatedAt: foundUser.CreatedAt,
+		UpdatedAt: foundUser.UpdatedAt,
+	}
+	token, err := u.tokenMaker.CreateToken(foundUser.Email, 3*time.Duration(24)*time.Minute)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.LoginUserResponse{
+		UserResponse: userResponse,
+		AccessToken:  token,
+	}, nil
+}
