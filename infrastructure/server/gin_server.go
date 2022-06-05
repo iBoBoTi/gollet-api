@@ -91,6 +91,17 @@ func (g *ginEngine) setAppHandlers() {
 	userRouter := v1.Group("/users")
 	userRouter.POST("/", userHandler.SignUpUser)
 	userRouter.POST("/login", userHandler.LoginUser)
+
+	// Product Routes
+	productRepo := psql.NewProductRepository(db.Postgres)
+	productService := usecase.NewProductService(productRepo)
+	productHandler := handler.NewProductHandler(productService)
+
+	productRouter := v1.Group("/products")
+	productRouter.GET("/", productHandler.GetProductsList)
+	productRouter.POST("/", productHandler.CreateProduct)
+	productRouter.GET("/:id", productHandler.GetProductByID)
+
 	g.router.GET("/ping", func(c *gin.Context) {
 		c.String(http.StatusOK, "pong")
 	})
