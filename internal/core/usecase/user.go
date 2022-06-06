@@ -76,3 +76,32 @@ func (u *userService) LoginUser(loginRequest *domain.LoginUserRequest) (*domain.
 		AccessToken:  token,
 	}, nil
 }
+
+func (u *userService) CreditUserWallet(userID, amount int64) (*domain.Wallet, error) {
+	wallet, err := u.userRepository.GetUserWallet(userID)
+	if err != nil {
+		return nil, err
+	}
+	wallet.Balance += amount
+	updatedWallet, err := u.userRepository.CreditUserWallet(userID, wallet.Balance)
+	if err != nil {
+		return nil, err
+	}
+	return updatedWallet, nil
+}
+
+func (u *userService) DebitUserWallet(userID, amount int64) (*domain.Wallet, error) {
+	wallet, err := u.userRepository.GetUserWallet(userID)
+	if err != nil {
+		return nil, err
+	}
+	if amount < wallet.Balance {
+		wallet.Balance -= amount
+		updatedWallet, err := u.userRepository.DebitUserWallet(userID, wallet.Balance)
+		if err != nil {
+			return nil, err
+		}
+		return updatedWallet, nil
+	}
+	return nil, errors.New("insufficient balance")
+}
