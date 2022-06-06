@@ -9,6 +9,7 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"
 	"net/http"
+	"strconv"
 )
 
 type userHandler struct {
@@ -74,4 +75,50 @@ func (u *userHandler) LoginUser(c *gin.Context) {
 	}
 
 	response.JSON(c, "Success", http.StatusOK, userResponse, nil)
+}
+
+func (u *userHandler) CreditUserWallet(c *gin.Context) {
+	user := c.MustGet("user").(*domain.User)
+	amt := c.Query("amount")
+	if amt == "" || amt == "0" {
+		amt = "0"
+	}
+	creditAmount, err := strconv.Atoi(amt)
+	if err != nil {
+		response.JSON(c, "invalid_request", http.StatusBadRequest, nil, nil)
+		return
+	}
+
+	wallet, err := u.userService.CreditUserWallet(user.ID, int64(creditAmount))
+	if err != nil {
+		response.JSON(c, "Error", http.StatusInternalServerError, nil, []string{err.Error()})
+		return
+	}
+
+	response.JSON(c, "Success", http.StatusOK, wallet, nil)
+}
+
+func (u *userHandler) DebitUserWallet(c *gin.Context) {
+	user := c.MustGet("user").(*domain.User)
+	amt := c.Query("amount")
+	if amt == "" || amt == "0" {
+		amt = "0"
+	}
+	debitAmount, err := strconv.Atoi(amt)
+	if err != nil {
+		response.JSON(c, "invalid_request", http.StatusBadRequest, nil, nil)
+		return
+	}
+
+	wallet, err := u.userService.DebitUserWallet(user.ID, int64(debitAmount))
+	if err != nil {
+		if err.Error() == "insufficient balance" {
+			response.JSON(c, "insufficient balance", http.StatusForbidden, nil, []string{err.Error()})
+			return
+		}
+		response.JSON(c, "Error", http.StatusInternalServerError, nil, []string{err.Error()})
+		return
+	}
+
+	response.JSON(c, "Success", http.StatusOK, wallet, nil)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/iBoBoTi/gollet-api/infrastructure/database"
 	"github.com/iBoBoTi/gollet-api/internal/adapters/api/handler"
 	"github.com/iBoBoTi/gollet-api/internal/adapters/api/helper"
+	"github.com/iBoBoTi/gollet-api/internal/adapters/api/middleware"
 	"github.com/iBoBoTi/gollet-api/internal/adapters/repository/psql"
 	"github.com/iBoBoTi/gollet-api/internal/core/usecase"
 	"log"
@@ -91,6 +92,11 @@ func (g *ginEngine) setAppHandlers() {
 	userRouter := v1.Group("/users")
 	userRouter.POST("/", userHandler.SignUpUser)
 	userRouter.POST("/login", userHandler.LoginUser)
+
+	// authenticated user routes
+	authRoutes := userRouter.Group("/").Use(middleware.AuthMiddleWare(userRepo.GetUserByEmail, tokenMaker))
+	authRoutes.POST("/credit-wallet", userHandler.CreditUserWallet)
+	authRoutes.POST("/debit-wallet", userHandler.DebitUserWallet)
 
 	// Product Routes
 	productRepo := psql.NewProductRepository(db.Postgres)
